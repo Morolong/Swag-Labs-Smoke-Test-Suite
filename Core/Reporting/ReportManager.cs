@@ -35,7 +35,7 @@ public static class ReportManager
         _extent.AddSystemInfo("Machine", Environment.MachineName);
         _extent.AddSystemInfo("OS", Environment.OSVersion.ToString());
 
-        Console.WriteLine($"[REPORT] REport initialised: {reportPath}"); 
+        Console.WriteLine($"[REPORT] Report initialised: {reportPath}"); 
     }
 
     public static void StartTest(string testName)
