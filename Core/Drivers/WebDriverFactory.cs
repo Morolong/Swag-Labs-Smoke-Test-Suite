@@ -4,7 +4,7 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Edge;
 using SmokeTestSuite.Core.Config; 
 
-namespace SeleniumFramework.Core.Drivers;
+namespace SmokeTestSuite.Core.Drivers;
 
 public static class  WebDriverFactory
 {
