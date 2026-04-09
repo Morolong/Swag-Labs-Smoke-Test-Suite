@@ -1,10 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using NUnit.Framework;
+using SmokeTestSuite.Core;
+using SmokeTestSuite.Core.Config;
+using SmokeTestSuite.Pages;
 
-namespace SmokeTestSuite.Tests
+namespace SmokeTestSuite.Tests;
+
+[TestFixture]
+[Category("Login")]
+[Parallelizable(ParallelScope.All)]
+public class LoginTests: BaseTest
 {
-    internal class Login
+    [Test]
+    [Category("Smoke")]
+    [Property("TestID", "SMK-001")]
+    [Description("Successful login with valid credentials")]
+    public void Login_WithValidCredentials()
     {
+        var username = ConfigurationManager.Credentials.PositiveTestUser;
+        var password = ConfigurationManager.Credentials.LoginPassword;
+
+        Log("Navigating to Login Page");
+        var loginPage = new LoginPage(Driver!);
+        loginPage.Open();
+
+        Log($"Logging in as: {username}");
+        var landingPage = loginPage.LoginAs(username, password);
+
+        Assert.That(landingPage.IsPageLoaded().Is.True,
+            "LandingPage should be loaded after successful login");
+
+        Log("Login successful - dashboard is displayed"); 
+    }
+
+    [Test]
+    [Category("Smoke")]
+    [Property("TestID", "SMK-002")]
+    [Description("Login rejected with invalid credentials")]
+    [Order(2)]
+    public void Login_WithInvalidCredentials()
+    {
+        var invalidUsername = ConfigurationManager.Credentials.NegativeTestUser;
+        var invalidPassword = ConfigurationManager.Credentials.NegativePassword;
+
+        Log("Navigating to Login Page");
+        var loginPage = new LoginPage(Driver!); 
+        loginPage.Open();
+
+        Log("Entering invalid credentials");
+        loginPage
+            .EnterUsername(invalidUsername)
+            .EnterPassword(invalidPassword)
+            .ClickLoginExpectingFailure();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(loginPage.IsErrorMessageDisplayed(), Is.True,
+                "An error message should be displayed for invalid credentials");
+
+            Assert.That(loginPage.GetErrorMessage(), Does.Contain("Invalid").Or.Contain("incorrect"),
+                "Error message should indicate credentials are wrong");
+
+            Assert.That(Driver!.Url, Does.Contain("/login"),
+                "User should remain on the login page after failed login");
+        });
+
     }
 }
