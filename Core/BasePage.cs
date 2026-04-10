@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using OpenQA.Selenium;
 using OpenQA.Selenium.BiDi.BrowsingContext;
-using OpenQA.Selenium.Interaction;
 using OpenQA.Selenium.Interactions;
 using SmokeTestSuite.Core.Config;
 using SmokeTestSuite.Core.Helpers;
