@@ -24,12 +24,12 @@ public class LoginTests: BaseTest
         loginPage.Open();
 
         Log($"Logging in as: {username}");
-        var landingPage = loginPage.LoginAs(username, password);
+        var productInventoryPage = loginPage.LoginAs(username, password);
 
-        Assert.That(landingPage.IsPageLoaded().Is.True,
-            "LandingPage should be loaded after successful login");
+        Assert.That(productInventoryPage.IsPageLoaded().Is.True,
+            "ProductInventoryPage should be loaded after successful login");
 
-        Log("Login successful - dashboard is displayed"); 
+        Log("Login successful - Inventory is displayed"); 
     }
 
     [Test]
