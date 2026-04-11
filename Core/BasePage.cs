@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using OpenQA.Selenium;
-using OpenQA.Selenium.BiDi.BrowsingContext;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using SmokeTestSuite.Core.Config;
 using SmokeTestSuite.Core.Helpers;
@@ -18,7 +16,7 @@ public abstract class BasePage
     }
 
     protected abstract string PagePath { get; }
-    protected abstract bool IsPageLoaded();
+    protected abstract void WaitForPageToLoad();
 
     public virtual BasePage Open()
     {
@@ -26,8 +24,7 @@ public abstract class BasePage
         var path = PagePath.TrimStart('/');
         Driver.Navigate().GoToUrl($"{baseUrl}/{path}");
 
-        Wait.Until(() => IsPageLoaded(),
-            $"Page '{GetType().Name}' did not load at {Driver.Url}");
+        WaitForPageToLoad(); 
         return this;
     }
 
@@ -60,19 +57,11 @@ public abstract class BasePage
     {
         try
         {
-            Driver.Manage().Timeouts().ImplicitWait = TimeSpan.Zero;
-            var elements = Driver.FindElements(locator);
-            return elements.Count > 0 && elements[0].Displayed; 
+            return Wait.ForElementToBeVisible(locator).Displayed;
         }
-        catch (Exception)
+        catch
         {
-            return false; 
-        }
-        //May have to update this to not have such waits 
-        finally
-        {
-            Driver.Manage().Timeouts().ImplicitWait =
-                TimeSpan.FromSeconds(ConfigurationManager.Settings.ImplicitWaitSeconds);
+            return false;
         }
     }
 

@@ -26,7 +26,7 @@ public class LoginTests: BaseTest
         Log($"Logging in as: {username}");
         var productInventoryPage = loginPage.LoginAs(username, password);
 
-        Assert.That(productInventoryPage.IsPageLoaded().Is.True,
+        Assert.That(productInventoryPage.IsPageDisplayed(),Is.True,
             "ProductInventoryPage should be loaded after successful login");
 
         Log("Login successful - Inventory is displayed"); 
