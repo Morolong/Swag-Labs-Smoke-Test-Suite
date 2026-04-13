@@ -74,8 +74,7 @@ public abstract class BaseTest
         }
 
         Driver?.Quit();
-        Driver = null;
-        Driver.Dispose(); 
+        Driver = null; 
     }
 
     [OneTimeTearDown]
