@@ -10,7 +10,7 @@ public static class ReportManager
     private static ExtentReports? _extent;
 
     [ThreadStatic]
-    private static ExtentTest? _currentTest; 
+    private static ExtentTest? _currentTest;
 
     public static void InitializeReport()
     {
@@ -20,8 +20,14 @@ public static class ReportManager
             settings.ReportDirectory,
             $"{settings.ReportName}_{DateTime.Now:yyyyMMdd_HHmmss}.html");
 
-        var sparkReporter = new ExtentSparkReporter(reportPath);
+        var reportDirectory = Path.GetDirectoryName(reportPath);
+        if (!string.IsNullOrEmpty(reportDirectory))
+        {
+            Directory.CreateDirectory(reportDirectory);
+        }
 
+        var sparkReporter = new ExtentSparkReporter(reportPath);
+    
         sparkReporter.Config.DocumentTitle = "Test Exectution Report";
         sparkReporter.Config.Theme = Theme.Dark;
         sparkReporter.Config.TimelineEnabled = true;
