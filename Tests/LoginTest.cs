@@ -57,12 +57,8 @@ public class LoginTests: BaseTest
             Assert.That(loginPage.IsErrorMessageDisplayed(), Is.True,
                 "An error message should be displayed for invalid credentials");
 
-            Assert.That(loginPage.GetErrorMessage(), Does.Contain("Invalid").Or.Contain("incorrect"),
+            Assert.That(loginPage.GetErrorMessage(), Does.Contain("Epic sadface").Or.Contain("not match"),
                 "Error message should indicate credentials are wrong");
-
-            Assert.That(Driver!.Url, Does.Contain("/login"),
-                "User should remain on the login page after failed login");
         });
-
     }
 }

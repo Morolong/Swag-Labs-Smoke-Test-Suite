@@ -5,13 +5,13 @@ namespace SmokeTestSuite.Pages;
 
 public class LoginPage : BasePage
 {
-    private readonly By _usernameField = By.Id("email");
+    private readonly By _usernameField = By.Id("user-name");
     private readonly By _passwordField = By.Id("password");
-    private readonly By _loginButton = By.CssSelector("[data-testId='login-btn']");
-    private readonly By _errorMessage = By.CssSelector(".alert-danger");
-    private readonly By _loginFormContainer = By.CssSelector(".login-container");
+    private readonly By _loginButton = By.Id("login-button");
+    private readonly By _errorMessage = By.CssSelector("h3[data-test='error']");
+    private readonly By _loginFormContainer = By.ClassName("login-box");
 
-    protected override string PagePath => "/login";
+    //protected override string PagePath => "/login";
 
     public LoginPage(IWebDriver driver) : base(driver) { }
 
