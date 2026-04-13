@@ -11,8 +11,8 @@ public static class  WebDriverFactory
     public static IWebDriver CreateDriver()
     {
         var browser = ConfigurationManager.Settings.Browser.ToLower();
-        var headless = ConfigurationManager.Settings.headless;
-        var implicitWait = ConfigurationManager.Settings.ImplicitWatSeconds;
+        var headless = ConfigurationManager.Settings.Headless;
+        var implicitWait = ConfigurationManager.Settings.ImplicitWaitSeconds;
 
         IWebDriver driver = browser switch
         {
@@ -44,9 +44,8 @@ public static class  WebDriverFactory
             options.AddArgument("--window-size=1920,1080");
         }
 
-        // Suppress Chrome's "DevTools listening on..." console noise
         options.AddArgument("--log-level=3");
-        options.AddExcludedArgument("enable-automation");  // Hides "Chrome is being controlled" bar
+        options.AddExcludedArgument("enable-automation");  
 
         return new ChromeDriver(options);
     }
