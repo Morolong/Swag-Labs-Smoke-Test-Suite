@@ -11,8 +11,6 @@ public class LoginPage : BasePage
     private readonly By _errorMessage = By.CssSelector("h3[data-test='error']");
     private readonly By _loginFormContainer = By.ClassName("login-box");
 
-    //protected override string PagePath => "/login";
-
     public LoginPage(IWebDriver driver) : base(driver) { }
 
     protected override void WaitForPageToLoad() => IsElementVisible(_loginFormContainer);
