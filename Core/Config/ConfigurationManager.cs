@@ -29,9 +29,9 @@ public static class ConfigurationManager
         new(() => LoadConfiguration());
 
     public static TestSettings Settings => _config.Value.Settings;
-    public static Credentials Credentials => _config.Value.Credentials; 
+    public static Credentials Credentials => _config.Value.Credentials;
 
-    private static (TestSettings Settings, Credentials Credentials) LoadConfiguration() 
+    private static (TestSettings Settings, Credentials Credentials) LoadConfiguration()
     {
         var configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
@@ -42,9 +42,22 @@ public static class ConfigurationManager
         var settings = configuration.GetSection("TestSettings").Get<TestSettings>()
             ?? throw new InvalidOperationException("TestSettings section missing from appsettings.json");
 
+        settings.ReportDirectory = ResolvePath(settings.ReportDirectory);
+        settings.ScreenshotDirectory = ResolvePath(settings.ScreenshotDirectory);
+
         var credentials = configuration.GetSection("Credentials").Get<Credentials>()
             ?? new Credentials();
 
         return (settings, credentials);
+    }
+
+    private static string ResolvePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return AppContext.BaseDirectory;
+
+        return Path.IsPathRooted(path)
+            ? path
+            : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, path));
     }
 }
