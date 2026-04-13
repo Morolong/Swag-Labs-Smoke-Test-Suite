@@ -15,14 +15,12 @@ public abstract class BasePage
         Wait = new WaitHelper(driver, ConfigurationManager.Settings.ExplicitWaitSeconds);
     }
 
-    protected abstract string PagePath { get; }
     protected abstract void WaitForPageToLoad();
 
     public virtual BasePage Open()
     {
         var baseUrl = ConfigurationManager.Settings.BaseUrl.TrimEnd('/');
-        var path = PagePath.TrimStart('/');
-        Driver.Navigate().GoToUrl($"{baseUrl}/{path}");
+        Driver.Navigate().GoToUrl($"{baseUrl}");
 
         WaitForPageToLoad(); 
         return this;
