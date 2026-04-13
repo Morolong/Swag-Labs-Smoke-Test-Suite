@@ -11,7 +11,7 @@ public class ProductInventory : BasePage
     private readonly By _pageHeading = By.ClassName("title");
     private readonly By _filter = By.ClassName("select_container");
 
-    protected override string PagePath => "/inventory";
+    //protected override string PagePath => "/inventory";
 
     public ProductInventory(IWebDriver driver) : base(driver) { }
 
