@@ -1,4 +1,6 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using SmokeTestSuite.Core;
 
 namespace SmokeTestSuite.Pages;
@@ -7,17 +9,43 @@ public class ProductInventory : BasePage
 {
     private readonly By _inventoryContainer = By.Id("inventory_container");
     private readonly By _appLogo = By.ClassName("app_logo");
-    private readonly By _shoppingCart = By.Id("shopping_cart_container");
+    private readonly By _checkOutCart = By.Id("shopping_cart_container");
     private readonly By _pageHeading = By.ClassName("title");
     private readonly By _filter = By.ClassName("select_container");
+    private readonly By _stockItem = By.ClassName("inventory_item");
+    private readonly By _addBackPack = By.Id("add-to-cart-sauce-labs-backpack");
+    private readonly By _stockImage = By.ClassName("inventory_item_img");
+    private readonly By _stockPrice = By.ClassName("inventory_item_price");
+    private readonly By _addToCartButton = By.ClassName("btn btn_primary btn_small btn_inventory ");
+    private readonly By _removeButton = By.Id("remove-sauce-labs-backpack");
+
 
     public ProductInventory(IWebDriver driver) : base(driver) { }
 
-    protected override void WaitForPageToLoad() => IsElementVisible(_inventoryContainer);
+    protected override void WaitForPageToLoad() =>
+      Wait.ForElementToBeVisible(_inventoryContainer);
 
     public bool IsPageDisplayed() => IsElementVisible(_inventoryContainer);
     public bool IsLogoVisible() => IsElementVisible(_appLogo);
-    public bool IsCartVisible() => IsElementVisible(_shoppingCart);
+    public bool IsCartVisible() => IsElementVisible(_checkOutCart);
     public bool IsHeadingVisible() => IsElementVisible(_pageHeading);
     public bool IsFilterVisible() => IsElementVisible(_filter);
+    public bool IsRemoveButtonVisible() => IsElementVisible(_removeButton);
+
+    public int GetStockCount() => GetElementCount(_stockItem);
+    public int GetStockImageCount() => GetElementCount(_stockImage);
+    public int GetStockLabelCount() => GetElementCount(_stockPrice);
+    public int GetAddToCartButtonCount() => GetElementCount(_addToCartButton);
+
+    public ProductInventory ClickAddToCart(string productId)
+    {
+        Click(By.Id($"add-to-cart-{productId}"));
+        return this;
+    }
+
+    public Cart GoToCart()
+    {
+        Click(_checkOutCart);
+        return new Cart(Driver);
+    }
 }

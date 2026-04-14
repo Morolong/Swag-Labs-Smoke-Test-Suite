@@ -22,7 +22,7 @@ public abstract class BasePage
         var baseUrl = ConfigurationManager.Settings.BaseUrl.TrimEnd('/');
         Driver.Navigate().GoToUrl($"{baseUrl}");
 
-        WaitForPageToLoad(); 
+        WaitForPageToLoad();
         return this;
     }
 
@@ -48,8 +48,16 @@ public abstract class BasePage
     protected string GetAttribute(By locator, string attribute)
     {
         var element = Wait.ForElementToBeVisible(locator);
-        return element.GetAttribute(attribute) ?? string.Empty;
+        string value = element.GetAttribute(attribute);
+
+        if (value == null)
+        {
+            throw new System.ArgumentException($"Attribute '{attribute}' not found on element {locator}");
+        }
+
+        return value;
     }
+
 
     protected bool IsElementVisible(By locator)
     {
@@ -57,7 +65,11 @@ public abstract class BasePage
         {
             return Wait.ForElementToBeVisible(locator).Displayed;
         }
-        catch
+        catch (WebDriverTimeoutException)
+        {
+            return false;
+        }
+        catch (NoSuchElementException)
         {
             return false;
         }
@@ -65,7 +77,7 @@ public abstract class BasePage
 
     protected void ScrollToElement(By locator)
     {
-        var element = Driver.FindElement(locator); 
+        var element = Wait.ForElementToBeVisible(locator);
         new Actions(Driver)
             .MoveToElement(element)
             .Perform();
@@ -77,5 +89,14 @@ public abstract class BasePage
             () => GetText(locator).Contains(expectedText, StringComparison.OrdinalIgnoreCase),
             $"Expected text '{expectedText}' not found in element {locator}"
         );
+    }
+
+    protected int GetElementCount(By locator, int expectedMinimum = 6)
+    {
+        Wait.Until(
+            () => Driver.FindElements(locator).Count >= expectedMinimum,
+            $"Expected at least {expectedMinimum} elements for {locator}"
+        );
+        return Driver.FindElements(locator).Count;
     }
 }
