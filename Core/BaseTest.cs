@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using SmokeTestSuite.Core.Config;
 using SmokeTestSuite.Core.Drivers;
 using SmokeTestSuite.Core.Helpers;
@@ -8,7 +9,6 @@ using SmokeTestSuite.Core.Reporting;
 
 namespace SmokeTestSuite.Core;
 
-[TestFixture]
 public abstract class BaseTest
 {
     [ThreadStatic]
@@ -36,11 +36,18 @@ public abstract class BaseTest
 
         Console.WriteLine($"[START] {_testName}");
 
-        Driver = WebDriverFactory.CreateDriver();
+        var options = new ChromeOptions();
+
+        // Disable Google Password Manager breach/save dialogs
+        options.AddUserProfilePreference("credentials_enable_service", false);
+        options.AddUserProfilePreference("password_manager_enabled", false);
+        options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
+
+        Driver = WebDriverFactory.CreateDriver(options);
 
         Wait = new WaitHelper(Driver, ConfigurationManager.Settings.ExplicitWaitSeconds);
 
-        ReportManager.StartTest(_testName); 
+        ReportManager.StartTest(_testName);
     }
 
     [TearDown]

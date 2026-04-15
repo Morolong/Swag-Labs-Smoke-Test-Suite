@@ -67,6 +67,9 @@ public class ProductInventoryTests : BaseTest
     }
 
     [Test]
+    [Category("Smoke")]
+    [Property("TestID", "SMK-005 & SMK-006")]
+    [Description("Check that Remove Button is visible")]
     public void VerifyRemoveButtonAppearsAfterAddToCart()
     {
         var inventoryPage = new ProductInventory(Driver).
