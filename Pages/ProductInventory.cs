@@ -54,6 +54,4 @@ public class ProductInventory : BasePage
         Click(_checkOutCart);
         return new Cart(Driver);
     }
-
-
 }
