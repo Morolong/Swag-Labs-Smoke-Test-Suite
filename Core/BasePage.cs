@@ -75,6 +75,8 @@ public abstract class BasePage
         }
     }
 
+    public bool IsAtPage(string expectedPath) =>
+    Driver.Url.Contains(expectedPath, StringComparison.OrdinalIgnoreCase);
     protected void ScrollToElement(By locator)
     {
         var element = Wait.ForElementToBeVisible(locator);

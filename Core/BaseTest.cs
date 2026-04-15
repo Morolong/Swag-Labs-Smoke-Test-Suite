@@ -74,6 +74,7 @@ public abstract class BaseTest
         }
 
         Driver?.Quit();
+        Driver?.Dispose();
         Driver = null; 
     }
 

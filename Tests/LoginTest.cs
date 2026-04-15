@@ -14,7 +14,7 @@ public class LoginTests: BaseTest
     [Category("Smoke")]
     [Property("TestID", "SMK-001")]
     [Description("Successful login with valid credentials")]
-    public void Login_WithValidCredentials()
+    public void LoginWithValidCredentials()
     {
         var username = ConfigurationManager.Credentials.PositiveTestUser;
         var password = ConfigurationManager.Credentials.LoginPassword;
