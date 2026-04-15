@@ -14,11 +14,13 @@ public class ProductInventory : BasePage
     private readonly By _filter = By.ClassName("select_container");
     private readonly By _stockItem = By.ClassName("inventory_item");
     private readonly By _addBackPack = By.Id("add-to-cart-sauce-labs-backpack");
-    private readonly By _stockImage = By.ClassName("inventory_item_img");
+    private readonly By _stockImage = By.CssSelector(".inventory_item_img img");
     private readonly By _stockPrice = By.ClassName("inventory_item_price");
-    private readonly By _addToCartButton = By.ClassName("btn btn_primary btn_small btn_inventory ");
+    private readonly By _addToCartButton = By.CssSelector("[id^='add-to-cart-']");
     private readonly By _removeButton = By.Id("remove-sauce-labs-backpack");
 
+
+    public bool IsAtPage() => base.IsAtPage("/inventory.html");
 
     public ProductInventory(IWebDriver driver) : base(driver) { }
 
@@ -37,6 +39,10 @@ public class ProductInventory : BasePage
     public int GetStockLabelCount() => GetElementCount(_stockPrice);
     public int GetAddToCartButtonCount() => GetElementCount(_addToCartButton);
 
+    public bool IsAtInventoryPage()
+    {
+        return Driver.Url.Contains("/inventory.html");
+    }
     public ProductInventory ClickAddToCart(string productId)
     {
         Click(By.Id($"add-to-cart-{productId}"));
@@ -48,4 +54,6 @@ public class ProductInventory : BasePage
         Click(_checkOutCart);
         return new Cart(Driver);
     }
+
+
 }
