@@ -20,7 +20,7 @@ public static class  WebDriverFactory
             "firefox" => CreateFirefoxDriver(headless),
             "edge" => CreateEdgeDriver(headless),
             _ => throw new ArgumentException(
-                $"Unsupported browser: '(browser)'.Valid options: chrome, firefox, edge ")
+                $"Unsupported browser: '{browser}'.Valid options: chrome, firefox, edge ")
         };
 
         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(implicitWait);
@@ -32,7 +32,11 @@ public static class  WebDriverFactory
 
     private static IWebDriver CreateChromeDriver(bool headless)
     {
-        var options = new ChromeOptions(); 
+        var options = new ChromeOptions();
+
+        options.AddUserProfilePreference("credentials_enable_service", false);
+        options.AddUserProfilePreference("password_manager_enabled", false);
+        options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
 
         if (headless)
         {
