@@ -1,6 +1,4 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 using SmokeTestSuite.Core;
 
 namespace SmokeTestSuite.Pages;
@@ -11,7 +9,7 @@ public class Cart : BasePage
     private readonly By _checkOutCart = By.Id("shopping_cart_container");
     private readonly By _menu = By.Id("menu_button_container");
     private readonly By _pageTitle = By.ClassName("title");
-    private readonly By _pageContainer = By.Id("cart_contents_container");
+    private readonly By _cartPageContainer = By.Id("cart_contents_container");
     private readonly By _quantityHeader = By.CssSelector("#cart_contents_container > div > div.cart_list > div.cart_quantity_label");
     private readonly By _descriptionHeader = By.CssSelector("#cart_contents_container > div > div.cart_list > div.cart_desc_label");
     private readonly By _purchaseQuantity = By.CssSelector("#cart_contents_container > div > div.cart_list > div.cart_item > div.cart_quantity");
@@ -23,23 +21,10 @@ public class Cart : BasePage
     public Cart(IWebDriver driver) : base(driver) { }
 
     protected override void WaitForPageToLoad() =>
-      Wait.ForElementToBeVisible(_pageContainer);
-
-    /* THIS CODE IS TOO REPEPTITIVE!
-    public bool IsLogoVisible() => IsElementVisible(_logo);
-    public bool IsCheckOutCartVisible() => IsElementVisible(_checkOutCart);
-    public bool IsMenuVisible() => IsElementVisible(_menu);
-    public bool IsPageTitleVisible() => IsElementVisible(_pageTitle);
-    public bool IsQuantityHeaderVisible() => IsElementVisible(_quantityHeader); 
-    public bool IsDescriptionHeaderVisible() => IsElementVisible(_descriptionHeader);
-    public bool IsPurchaseQuantityVisible() => IsElementVisible(_purchaseQuantity);
-    public bool IsTotalPriceVisible() => IsElementVisible(_totalPrice);
-    public bool IsRemoveButtonVisible() => IsElementVisible(_removeItemButton);
-    public bool IsContinueShoppingButtonVisible() => IsElementVisible(_continueShoppingButton); 
-    public bool IsCheckOutButtonVisible() => IsElementVisible(_checkOutButton);*/
+      Wait.ForElementToBeVisible(_cartPageContainer);
 
     public bool IsAtPage() => base.IsAtPage("/cart.html");
-    public IEnumerable<string> GetHiddenElements()
+    public IEnumerable<string> GetCartPageElements()
     {
         var elements = new Dictionary<string, By>
         {
