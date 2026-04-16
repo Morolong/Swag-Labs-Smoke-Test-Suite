@@ -38,12 +38,7 @@ public abstract class BaseTest
 
         var options = new ChromeOptions();
 
-        // Disable Google Password Manager breach/save dialogs
-        options.AddUserProfilePreference("credentials_enable_service", false);
-        options.AddUserProfilePreference("password_manager_enabled", false);
-        options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
-
-        Driver = WebDriverFactory.CreateDriver(options);
+        Driver = WebDriverFactory.CreateDriver();
 
         Wait = new WaitHelper(Driver, ConfigurationManager.Settings.ExplicitWaitSeconds);
 
