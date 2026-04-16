@@ -18,6 +18,7 @@ public class ProductInventory : BasePage
     private readonly By _stockPrice = By.ClassName("inventory_item_price");
     private readonly By _addToCartButton = By.CssSelector("[id^='add-to-cart-']");
     private readonly By _removeButton = By.Id("remove-sauce-labs-backpack");
+    private readonly By _redTShirt = By.CssSelector("#item_3_img_link > img"); 
 
 
     public bool IsAtPage() => base.IsAtPage("/inventory.html");
@@ -53,5 +54,11 @@ public class ProductInventory : BasePage
     {
         Click(_checkOutCart);
         return new Cart(Driver);
+    }
+
+    public ProductDetail GoToProductDetail()
+    {
+        Click(_redTShirt);
+        return new ProductDetail(Driver);
     }
 }

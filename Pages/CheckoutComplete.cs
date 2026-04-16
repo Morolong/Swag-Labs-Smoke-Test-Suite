@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SmokeTestSuite.Pages
 {
-    internal class CustomerInformation
+    internal class CheckoutComplete
     {
     }
 }

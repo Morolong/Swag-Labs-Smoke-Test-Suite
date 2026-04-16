@@ -58,7 +58,6 @@ public abstract class BasePage
         return value;
     }
 
-
     protected bool IsElementVisible(By locator)
     {
         try
