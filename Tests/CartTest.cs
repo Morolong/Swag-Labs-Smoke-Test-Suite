@@ -37,9 +37,9 @@ public class CartTests : BaseTest
         Assert.That(_cartPage.IsAtPage(), Is.True,
             "Expected to be on the cart page");
 
-        var hiddenElements = _cartPage.GetHiddenElements();
+        var cartPageElements = _cartPage.GetCartPageElements();
 
-        Assert.That(hiddenElements, Is.Empty,
-            $"Elements not visible: {string.Join(", ", hiddenElements)}");
+        Assert.That(cartPageElements, Is.Empty,
+            $"Elements not visible: {string.Join(", ", cartPageElements)}");
     }
 }
