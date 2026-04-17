@@ -18,6 +18,7 @@ public class Cart : BasePage
     private readonly By _continueShoppingButton = By.Id("continue-shopping");
     private readonly By _checkOutButton = By.Id("checkout"); 
 
+
     public Cart(IWebDriver driver) : base(driver) { }
 
     protected override void WaitForPageToLoad() =>
@@ -46,4 +47,9 @@ public class Cart : BasePage
             .Select(e => e.Key);
     }
 
+    public CheckoutCustomerInformation GoToCustInfo()
+    {
+        Click(_checkOutButton);
+        return new CheckoutCustomerInformation(Driver);
+    }
 }
