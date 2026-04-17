@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using SmokeTestSuite.Core;
+using SmokeTestSuite.Core.Config;
 
 namespace SmokeTestSuite.Pages;
 
@@ -14,6 +15,8 @@ public class LoginPage : BasePage
     public LoginPage(IWebDriver driver) : base(driver) { }
 
     protected override void WaitForPageToLoad() => IsElementVisible(_loginFormContainer);
+
+    public bool IsAtPage() => base.IsAtPage("/"); 
 
     public LoginPage EnterUsername(string username)
     {
@@ -56,4 +59,9 @@ public class LoginPage : BasePage
     public bool IsErrorMessageDisplayed() => IsElementVisible(_errorMessage);
 
     public string GetUsernamePlaceholder() => GetAttribute(_usernameField, "placeholder");
+
+    public bool IsPageDisplayed()
+    {
+        return Driver.FindElement(_loginFormContainer).Displayed;
+    }
 }
