@@ -15,7 +15,7 @@ public class CheckoutCustomerInformation : BasePage
     private readonly By _zipCodeInput = By.Id("postal-code");
     private readonly By _cancelButton = By.Id("cancel");
     private readonly By _continueButton = By.Id("continue");
-
+    private readonly By _emptyFieldErrorMsg = By.XPath("/html/body/div/div/div/div[2]/div/form/div[1]/div[4]/h3");
     public CheckoutCustomerInformation(IWebDriver driver) : base(driver) { }
 
     protected override void WaitForPageToLoad() =>
@@ -56,10 +56,50 @@ public class CheckoutCustomerInformation : BasePage
                string.IsNullOrEmpty(GetInputValue(_zipCodeInput));
     }
 
-
-    public CheckoutCustomerInformation EmptyFieldSubmit()
+   public CheckoutCustomerInformation EmptyFieldSubmit()
     {
         Click(_continueButton);
         return this;
+    }
+
+    public string GetEmptyInputErrorMessage()
+    {
+        return IsElementVisible(_emptyFieldErrorMsg)
+            ? GetText(_emptyFieldErrorMsg)
+            : string.Empty;
+    }
+
+    public bool IsEmptyFieldErrorMessageDisplayed() => IsElementVisible(_emptyFieldErrorMsg);
+
+    public CheckoutCustomerInformation EnterFirstName(string firstName)
+    {
+        TypeText(_firstNameInput, firstName);
+        return this;
+    }
+
+    public CheckoutCustomerInformation EnterLastName(string lastName)
+    {
+        TypeText(_lastNameInput, lastName);
+        return this;
+    }
+
+    public CheckoutCustomerInformation EnterZipCode(string zipCode)
+    {
+        TypeText(_zipCodeInput, zipCode);
+
+        return this;
+    }
+
+    public CheckoutCustomerInformation EnterUserDetails(string firstName, string lastName, string zipCode)
+    {
+        return EnterFirstName(firstName)
+            .EnterLastName(lastName)
+            .EnterZipCode(zipCode);
+    }
+
+    public CheckoutOverview ClickContinue()
+    {
+        Click(_continueButton);
+        return new CheckoutOverview(Driver);
     }
 }

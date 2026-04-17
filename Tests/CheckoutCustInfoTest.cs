@@ -52,5 +52,14 @@ public class CheckOutCustInfoTest : BaseTest
     "Expected all checkout fields to be empty before submitting.");
 
         _checkoutCustInfo.EmptyFieldSubmit();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(_checkoutCustInfo.IsEmptyFieldErrorMessageDisplayed(), Is.True,
+                "An error message should be displayed for invalid credentials");
+
+            Assert.That(_checkoutCustInfo.GetEmptyInputErrorMessage(), Does.Contain("Error"),
+                "Error message should indicate that the field is required");
+        });
     }
 }
