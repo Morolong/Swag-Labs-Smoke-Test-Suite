@@ -32,7 +32,7 @@ public class CheckoutOverview : BasePage
 
     public bool IsAtPage() => base.IsAtPage("checkout-step-two.html");
 
-    public IEnumerable<string> GetCheckoutCustInfoElements()
+    public IEnumerable<string> GetCheckoutOverviewElements()
     {
         var elements = new Dictionary<string, By>
         {
@@ -60,5 +60,11 @@ public class CheckoutOverview : BasePage
         return elements
             .Where(e => !IsElementVisible(e.Value))
             .Select(e => e.Key);
+    }
+
+    public CheckoutComplete ClickFinish()
+    {
+        Click(_finishButton);
+        return new CheckoutComplete(Driver);
     }
 }

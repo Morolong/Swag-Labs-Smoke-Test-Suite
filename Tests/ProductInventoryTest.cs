@@ -78,4 +78,19 @@ public class ProductInventoryTests : BaseTest
         Assert.That(inventoryPage.IsRemoveButtonVisible(), Is.True,
             "Remove is not visible after adding item to cart");
     }
+
+    [Test]
+    [Category("Smoke")]
+    [Property("TestID", "SMK-013")]
+    [Description("User logout")]
+    public void VerifyUserCanLogOut()
+    {
+        var loginPage = _inventoryPage.Logout();
+
+        Assert.That(loginPage.IsAtPage(), Is.True,
+            "User was not redirected to base login page after logout");
+
+        Assert.That(loginPage.IsPageDisplayed(), Is.True,
+            "Login page UI was not displayed after logout"); 
+    }
 }

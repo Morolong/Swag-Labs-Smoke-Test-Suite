@@ -12,7 +12,7 @@ public class CheckoutOverviewTest : BaseTest
     private CheckoutOverview _checkoutOverview;
 
     [SetUp]
-    public void CheckoutOverviewInfoSetUp()
+    public void CheckoutOverviewSetUp()
     {
         var username = ConfigurationManager.Credentials.PositiveTestUser;
         var password = ConfigurationManager.Credentials.LoginPassword;
@@ -41,7 +41,7 @@ public class CheckoutOverviewTest : BaseTest
         Assert.That(_checkoutOverview.IsAtPage(), Is.True,
             "Expected to be on the Checkout:Customer Information page");
 
-        var checkoutOverviewPageElements = _checkoutOverview.GetCheckoutCustInfoElements();
+        var checkoutOverviewPageElements = _checkoutOverview.GetCheckoutOverviewElements();
 
         Assert.That(checkoutOverviewPageElements, Is.Empty,
             $"Elements not visible: {string.Join(", ", checkoutOverviewPageElements)}");
