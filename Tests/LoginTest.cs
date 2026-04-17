@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using SmokeTestSuite.Core;
+﻿using SmokeTestSuite.Core;
 using SmokeTestSuite.Core.Config;
 using SmokeTestSuite.Pages;
 
