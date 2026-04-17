@@ -23,15 +23,23 @@ public class Credentials
     public string NegativePassword { get; set; }
 }
 
+public class UserDetails
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string ZipCode { get; set; }
+}
+
 public static class ConfigurationManager
 {
-    private static readonly Lazy<(TestSettings Settings, Credentials Credentials)> _config =
+    private static readonly Lazy<(TestSettings Settings, Credentials Credentials, UserDetails UserDetails)> _config =
         new(() => LoadConfiguration());
 
     public static TestSettings Settings => _config.Value.Settings;
     public static Credentials Credentials => _config.Value.Credentials;
+    public static UserDetails UserDetails => _config.Value.UserDetails;
 
-    private static (TestSettings Settings, Credentials Credentials) LoadConfiguration()
+    private static (TestSettings Settings, Credentials Credentials, UserDetails UserDetails) LoadConfiguration()
     {
         var configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
@@ -48,7 +56,10 @@ public static class ConfigurationManager
         var credentials = configuration.GetSection("Credentials").Get<Credentials>()
             ?? new Credentials();
 
-        return (settings, credentials);
+        var userDetails = configuration.GetSection("UserDetails").Get<UserDetails>()
+            ?? new UserDetails(); 
+
+        return (settings, credentials, userDetails);
     }
 
     private static string ResolvePath(string path)
