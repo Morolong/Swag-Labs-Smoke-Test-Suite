@@ -18,6 +18,7 @@ public class CartTests : BaseTest
         var username = ConfigurationManager.Credentials.PositiveTestUser;
         var password = ConfigurationManager.Credentials.LoginPassword;
 
+        Log("Navigating to Login Page");
         var loginPage = new LoginPage(Driver!);
         loginPage.Open();
 
@@ -34,8 +35,11 @@ public class CartTests : BaseTest
     [Description("Cart Page Loads Correctly")]
     public void VerifyCartPageElements()
     {
+        FailureMessage = "Cart Page did not load correctly or the URL has been changed.";
+
+        Log("Checking that Cart Page has the correct URL.");
         Assert.That(_cartPage.IsAtPage(), Is.True,
-            "Expected to be on the cart page");
+            FailureMessage);
 
         var cartPageElements = _cartPage.GetCartPageElements();
 

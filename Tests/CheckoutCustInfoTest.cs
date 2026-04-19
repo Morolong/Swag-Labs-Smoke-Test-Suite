@@ -17,9 +17,11 @@ public class CheckOutCustInfoTest : BaseTest
         var username = ConfigurationManager.Credentials.PositiveTestUser;
         var password = ConfigurationManager.Credentials.LoginPassword;
 
+        Log("Navigating to Login Page");
         var loginPage = new LoginPage(Driver!);
         loginPage.Open();
 
+        Log("Logging in to Sauce Labs.");
         var inventoryPage = loginPage.LoginAs(username, password);
 
         _checkoutCustInfo = inventoryPage
@@ -33,6 +35,7 @@ public class CheckOutCustInfoTest : BaseTest
     [Description("Verify Customer Informatin Page Loads Correctly")]
     public void VerifyCheckoutCustInfoPageElements()
     {
+        Log("Checking that user was directed to the Checkout: Customer Information page.");
         Assert.That(_checkoutCustInfo.IsAtPage(), Is.True,
             "Expected to be on the Checkout:Customer Information page");
 

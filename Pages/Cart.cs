@@ -21,12 +21,27 @@ public class Cart : BasePage
 
     public Cart(IWebDriver driver) : base(driver) { }
 
-    protected override void WaitForPageToLoad() =>
-      Wait.ForElementToBeVisible(_cartPageContainer);
+    protected override void WaitForPageToLoad()
+    {
+        LogStep("Waiting for Cart Page to load");
+
+        try
+        {
+            Wait.ForElementToBeVisible(_cartPageContainer);
+            LogStep("Cart Page loaded successfully");
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+            LogStep($"Cart Page failed to load - container element not visible within timeout: {ex.Message}");
+            throw;
+        }
+        
+    }
 
     public bool IsAtPage() => base.IsAtPage("/cart.html");
     public IEnumerable<string> GetCartPageElements()
     {
+        LogStep($"Checking Cart Page elements are visible.");
         var elements = new Dictionary<string, By>
         {
             { "Logo",                  _logo },
@@ -42,13 +57,22 @@ public class Cart : BasePage
             { "Checkout Button",       _checkOutButton }
         };
 
-        return elements
+        var missingElements = elements
             .Where(e => !IsElementVisible(e.Value))
-            .Select(e => e.Key);
+            .Select(e => e.Key)
+            .ToList();
+
+        if (missingElements.Any())
+            LogStep($"Missing elements: {string.Join(", ", missingElements)}");
+        else
+            LogStep("All Cart Page elements are visible");
+
+        return missingElements;
     }
 
     public CheckoutCustomerInformation GoToCustInfo()
     {
+        LogStep($"Clicking the Check-out button");
         Click(_checkOutButton);
         return new CheckoutCustomerInformation(Driver);
     }

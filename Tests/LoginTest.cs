@@ -25,8 +25,11 @@ public class LoginTests: BaseTest
         Log($"Logging in as: {username}");
         var productInventoryPage = loginPage.LoginAs(username, password);
 
+        FailureMessage = "Login failed — Product Inventory page was not displayed after entering valid credentials";
+
+        Log("Login successful - Inventory is displayed");
         Assert.That(productInventoryPage.IsPageDisplayed(),Is.True,
-            "ProductInventoryPage should be loaded after successful login");
+            FailureMessage);
 
         Log("Login successful - Inventory is displayed"); 
     }
@@ -50,13 +53,17 @@ public class LoginTests: BaseTest
             .EnterPassword(invalidPassword)
             .ClickLoginExpectingFailure();
 
+        FailureMessage = "Error message was not displayed.";
+
         Assert.Multiple(() =>
         {
             Assert.That(loginPage.IsErrorMessageDisplayed(), Is.True,
-                "An error message should be displayed for invalid credentials");
+                FailureMessage);
 
             Assert.That(loginPage.GetErrorMessage(), Does.Contain("Epic sadface").Or.Contain("not match"),
                 "Error message should indicate credentials are wrong");
+
+            Log("Login using invalid credentials was unsuccessful.");
         });
     }
 }

@@ -15,12 +15,10 @@ public static class ScreenshotHelper
                 return null; 
             }
 
-            // Build a filename: sanitise the test name and append a timestamp
             var sanitisedName = SanitiseFileName(testName); 
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var fileName = $"{sanitisedName}_{timestamp}.png";
 
-            // Combine with the configured directory path
             var directory = ConfigurationManager.Settings.ScreenshotDirectory;
             var filePath = Path.Combine(directory, fileName);
 

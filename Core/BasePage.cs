@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Interactions;
 using SmokeTestSuite.Core.Config;
 using SmokeTestSuite.Core.Helpers;
+using SmokeTestSuite.Core.Reporting;
 
 namespace SmokeTestSuite.Core;
 
@@ -99,5 +100,11 @@ public abstract class BasePage
             $"Expected at least {expectedMinimum} elements for {locator}"
         );
         return Driver.FindElements(locator).Count;
+    }
+
+    protected void LogStep(string message)
+    {
+        ReportManager.LogInfo(message);
+        Console.WriteLine($"[STEP] {message}");
     }
 }

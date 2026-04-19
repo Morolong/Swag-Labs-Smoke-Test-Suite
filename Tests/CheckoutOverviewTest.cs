@@ -20,9 +20,11 @@ public class CheckoutOverviewTest : BaseTest
         var lastName = ConfigurationManager.UserDetails.LastName;
         var zipCode = ConfigurationManager.UserDetails.ZipCode;
 
+        Log("Navigating to Login Page");
         var loginPage = new LoginPage(Driver!);
         loginPage.Open();
 
+        Log("Logging in to Sauce Labs.");
         var inventoryPage = loginPage.LoginAs(username, password);
 
         _checkoutOverview = inventoryPage
@@ -38,8 +40,9 @@ public class CheckoutOverviewTest : BaseTest
     [Description("Verify Checkout: Overview Page Loads Correctly")]
     public void VerifyCheckoutOverviewPageElements()
     {
+        Log("Checking that user was directed to the Checkout Overview page.");
         Assert.That(_checkoutOverview.IsAtPage(), Is.True,
-            "Expected to be on the Checkout:Customer Information page");
+            "Expected to be on the Checkout Overview page");
 
         var checkoutOverviewPageElements = _checkoutOverview.GetCheckoutOverviewElements();
 
