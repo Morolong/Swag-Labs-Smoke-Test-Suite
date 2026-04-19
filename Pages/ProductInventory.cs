@@ -73,4 +73,9 @@ public class ProductInventory : BasePage
 
         return new LoginPage(Driver);
     }
+    public ProductInventory ClickRemoveButton()
+    {
+        Click(_removeButton);
+        return this;
+    }
 }
