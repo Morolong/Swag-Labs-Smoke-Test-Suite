@@ -35,7 +35,6 @@ public class LoginTests: BaseTest
     [Category("Smoke")]
     [Property("TestID", "SMK-002")]
     [Description("Login rejected with invalid credentials")]
-    [Order(2)]
     public void Login_WithInvalidCredentials()
     {
         var invalidUsername = ConfigurationManager.Credentials.NegativeTestUser;

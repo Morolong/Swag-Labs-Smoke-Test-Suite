@@ -68,8 +68,8 @@ public class ProductInventoryTests : BaseTest
 
     [Test]
     [Category("Smoke")]
-    [Property("TestID", "SMK-005 & SMK-006")]
-    [Description("Check that Remove Button is visible")]
+    [Property("TestID", "SMK-005")]
+    [Description("Add a product to the cart")]
     public void VerifyRemoveButtonAppearsAfterAddToCart()
     {
         var inventoryPage = new ProductInventory(Driver).
@@ -77,6 +77,20 @@ public class ProductInventoryTests : BaseTest
 
         Assert.That(inventoryPage.IsRemoveButtonVisible(), Is.True,
             "Remove is not visible after adding item to cart");
+    }
+
+    [Test]
+    [Category("Smoke")]
+    [Property("TestID", "SMK-006")]
+    [Description("Remove a Product from the Cart")]
+    public void RemoveProductFromCart()
+    {
+        var inventoryPage = new ProductInventory(Driver)
+        .ClickAddToCart("sauce-labs-backpack")
+        .ClickRemoveButton();
+
+        Assert.That(inventoryPage.IsRemoveButtonVisible(), Is.False,
+            "Remove button should not be visible after removing item from cart");
     }
 
     [Test]
