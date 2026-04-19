@@ -1,6 +1,8 @@
 ﻿using OpenQA.Selenium;
 using SmokeTestSuite.Core;
 using SmokeTestSuite.Core.Config;
+using SmokeTestSuite.Core.Helpers;
+using SmokeTestSuite.Core.Reporting; 
 
 namespace SmokeTestSuite.Pages;
 
@@ -14,30 +16,48 @@ public class LoginPage : BasePage
 
     public LoginPage(IWebDriver driver) : base(driver) { }
 
-    protected override void WaitForPageToLoad() => IsElementVisible(_loginFormContainer);
+    protected override void WaitForPageToLoad()
+    {
+        LogStep("Waiting for Login Page to load");
+
+        try
+        {
+            Wait.ForElementToBeVisible(_loginFormContainer);
+            LogStep("Login Page loaded successfully");
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+            LogStep($"Login Page failed to load - container element not visible within timeout: {ex.Message}");
+            throw;
+        }
+    }
 
     public bool IsAtPage() => base.IsAtPage("/"); 
 
     public LoginPage EnterUsername(string username)
     {
+        LogStep($"Entering username: {username}");
         TypeText(_usernameField, username);
         return this;
     }
 
     public LoginPage EnterPassword(string password)
     {
+        LogStep($"Entering password: {password}");
         TypeText(_passwordField, password);
         return this;
     }
 
     public ProductInventory ClickLoginExpectingSuccess()
     {
+        LogStep($"Clicking Login");
         Click(_loginButton);
         return new ProductInventory(Driver);
     }
 
     public LoginPage ClickLoginExpectingFailure()
     {
+        LogStep($"Clicking Login");
         Click(_loginButton);
         return this;
     }

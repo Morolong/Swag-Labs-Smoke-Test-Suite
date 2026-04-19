@@ -5,7 +5,7 @@ using OpenQA.Selenium.Chrome;
 using SmokeTestSuite.Core.Config;
 using SmokeTestSuite.Core.Drivers;
 using SmokeTestSuite.Core.Helpers;
-using SmokeTestSuite.Core.Reporting; 
+using SmokeTestSuite.Core.Reporting;
 
 namespace SmokeTestSuite.Core;
 
@@ -15,14 +15,16 @@ public abstract class BaseTest
     protected static IWebDriver? Driver;
 
     [ThreadStatic]
-    protected static WaitHelper? Wait; 
+    protected static WaitHelper? Wait;
+
+    [ThreadStatic]
+    protected static string? FailureMessage;  // 👈 1. Added
 
     private string _testName = string.Empty;
 
     [OneTimeSetUp]
-
     public void OneTimeSetUp()
-        {
+    {
         Directory.CreateDirectory(ConfigurationManager.Settings.ScreenshotDirectory);
         Directory.CreateDirectory(ConfigurationManager.Settings.ReportDirectory);
 
@@ -33,6 +35,7 @@ public abstract class BaseTest
     public void SetUp()
     {
         _testName = TestContext.CurrentContext.Test.Name;
+        FailureMessage = null;
 
         Console.WriteLine($"[START] {_testName}");
 
@@ -53,31 +56,34 @@ public abstract class BaseTest
 
         bool testFailed = outcome.Status is TestStatus.Failed or TestStatus.Warning;
 
-        if (testFailed && Driver !=null)
+        if (testFailed && Driver != null)
         {
             if (ConfigurationManager.Settings.TakeScreenshotOnFailure)
             {
-                var screenshotPath = ScreenshotHelper.TakeScreenshot(Driver, _testName); 
+                var screenshotPath = ScreenshotHelper.TakeScreenshot(Driver, _testName);
                 if (screenshotPath != null)
                 {
                     ReportManager.AttachScreenshot(screenshotPath);
-
-                    TestContext.AddTestAttachment(screenshotPath, "Failure Screenshot"); 
+                    TestContext.AddTestAttachment(screenshotPath, "Failure Screenshot");
                 }
             }
 
-            ReportManager.FailTest(message ?? "Test failed");
-            Console.WriteLine($"[FAIL] {_testName}"); 
+            var fullMessage = FailureMessage != null
+                ? $"{FailureMessage}{Environment.NewLine}Technical Detail: {message}"
+                : message ?? "Test failed";
+
+            ReportManager.FailTest(fullMessage);
+            Console.WriteLine($"[FAIL] {_testName}: {fullMessage}");
         }
         else
         {
             ReportManager.PassTest();
-            Console.WriteLine($"[PASS] {_testName}"); 
+            Console.WriteLine($"[PASS] {_testName}");
         }
 
         Driver?.Quit();
         Driver?.Dispose();
-        Driver = null; 
+        Driver = null;
     }
 
     [OneTimeTearDown]
@@ -92,19 +98,18 @@ public abstract class BaseTest
         if (Driver == null)
             throw new InvalidOperationException("Driver not initialized");
 
-        Driver!.Navigate().GoToUrl(ConfigurationManager.Settings.BaseUrl); 
+        Driver!.Navigate().GoToUrl(ConfigurationManager.Settings.BaseUrl);
     }
 
     protected void NavigateTo(string relativeUrl)
     {
         var fullUrl = $"{ConfigurationManager.Settings.BaseUrl.TrimEnd('/')}/{relativeUrl.TrimStart('/')}";
-        Driver!.Navigate().GoToUrl(fullUrl); 
+        Driver!.Navigate().GoToUrl(fullUrl);
     }
 
     protected void Log(string message)
     {
         ReportManager.LogInfo(message);
-        Console.WriteLine($"[LOG] {message}"); 
+        Console.WriteLine($"[LOG] {message}");
     }
-
 }

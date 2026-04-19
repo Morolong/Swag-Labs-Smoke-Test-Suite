@@ -20,8 +20,10 @@ public class ProductDetailTest : BaseTest
         var loginPage = new LoginPage(Driver!);
         loginPage.Open();
 
+        Log("Navigating to Login Page");
         var inventoryPage = loginPage.LoginAs(username, password);
 
+        Log("Logging into Sauce Labs.");
         _productDetail = inventoryPage.GoToProductDetail();
     }
 
@@ -31,6 +33,7 @@ public class ProductDetailTest : BaseTest
     [Description("Product Detail Loads Correctly")]
     public void VerifyProductDetailPageElements()
     {
+        Log("Checking that user was directed to the Product Detail page.");
         Assert.That(_productDetail.IsAtPage(), Is.True,
             "Expected to be on the cart page");
 

@@ -44,15 +44,7 @@ namespace SmokeTestSuite.Core.Helpers
         {
             return _wait.Until(SeleniumConditions.TitleIs(expectedTitle));
         }
-       //May not be necessary as there is already driver in _wait 
-        /* public void ForPageToLoad(IWebDriver driver)
-        {
-            _wait.Until(d =>
-            {
-                var readyState = ((IJavaScriptExecutor)d).ExecuteScript("return document.readyState")?.ToString();
-                return readyState == "complete";
-            });
-        }*/
+
         public void Until(Func<bool> condition, string errormessage = "Condition was not met within timeout")
         {
             try
@@ -64,11 +56,5 @@ namespace SmokeTestSuite.Core.Helpers
                 throw new TimeoutException($"{errormessage} (timeout: {_timeoutSeconds}s)");
             }
         }
-        //Avoid Hard Waits as far as possible. 
-       /* public static void HardWait(int milliseconds)
-        {
-
-            Thread.Sleep(milliseconds);
-        }*/
     }
 }

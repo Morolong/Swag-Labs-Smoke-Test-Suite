@@ -27,15 +27,29 @@ public class CheckoutOverview : BasePage
 
     public CheckoutOverview(IWebDriver driver) : base(driver) { }
 
-    protected override void WaitForPageToLoad() =>
-    Wait.ForElementToBeVisible(_pageContainer);
+    protected override void WaitForPageToLoad()
+    {
+        LogStep("Waiting for Checkout Overview Page to load");
+
+        try
+        {
+            Wait.ForElementToBeVisible(_pageContainer);
+            LogStep("Checkout Overview Page loaded successfully");
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+            LogStep($"Checkout Overview Page failed to load - container element not visible within timeout: {ex.Message}");
+            throw;
+        }
+    }
 
     public bool IsAtPage() => base.IsAtPage("checkout-step-two.html");
 
     public IEnumerable<string> GetCheckoutOverviewElements()
     {
+        LogStep($"Checking that Checkout Overview Page elements are visible.");
         var elements = new Dictionary<string, By>
-        {
+    {
             { "Logo",                                    _logo },
             { "Checkout Cart",                           _checkOutCart },
             { "Menu",                                    _menu },
@@ -55,15 +69,24 @@ public class CheckoutOverview : BasePage
             { "Total Purchas Price",                     _priceTotal  },
             { "Cancel Button",                           _cancelButton },
             { "Finish Button",                           _finishButton},
-        };
+    };
 
-        return elements
+        var missingElements = elements
             .Where(e => !IsElementVisible(e.Value))
-            .Select(e => e.Key);
+            .Select(e => e.Key)
+            .ToList();
+
+        if (missingElements.Any())
+            LogStep($"Missing elements: {string.Join(", ", missingElements)}");
+        else
+            LogStep("All Checkout Overview Page elements are visible");
+
+        return missingElements;
     }
 
     public CheckoutComplete ClickFinish()
     {
+        LogStep("Clicking Finish Button");
         Click(_finishButton);
         return new CheckoutComplete(Driver);
     }

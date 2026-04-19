@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using SmokeTestSuite.Core;
+using System.Reflection.Emit;
 
 namespace SmokeTestSuite.Pages;
 
@@ -18,15 +19,29 @@ public class CheckoutCustomerInformation : BasePage
     private readonly By _emptyFieldErrorMsg = By.XPath("/html/body/div/div/div/div[2]/div/form/div[1]/div[4]/h3");
     public CheckoutCustomerInformation(IWebDriver driver) : base(driver) { }
 
-    protected override void WaitForPageToLoad() =>
-    Wait.ForElementToBeVisible(_pageContainer);
+    protected override void WaitForPageToLoad()
+    {
+        LogStep("Waiting for Checkout: Customer Information Page to load");
+
+        try
+        {
+            Wait.ForElementToBeVisible(_pageContainer);
+            LogStep("Checkout: Customer Information Page loaded successfully");
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+            LogStep($"Checkout: Customer Information Page failed to load - container element not visible within timeout: {ex.Message}");
+            throw;
+        }
+    }
 
     public bool IsAtPage() => base.IsAtPage("checkout-step-one.html");
 
     public IEnumerable<string> GetCheckoutCustInfoElements()
     {
+        LogStep($"Checking that Checkout: Customer Information Page elements are visible.");
         var elements = new Dictionary<string, By>
-        {
+    {
             { "Logo",                                    _logo },
             { "Checkout Cart",                           _checkOutCart },
             { "Menu",                                    _menu },
@@ -37,11 +52,19 @@ public class CheckoutCustomerInformation : BasePage
             { "Zip Code",                                _zipCodeInput },
             { "Cancel",                                  _cancelButton },
             { "Continue",                                _continueButton },
-        };
+    };
 
-        return elements
+        var missingElements = elements
             .Where(e => !IsElementVisible(e.Value))
-            .Select(e => e.Key);
+            .Select(e => e.Key)
+            .ToList();
+
+        if (missingElements.Any())
+            LogStep($"Missing elements: {string.Join(", ", missingElements)}");
+        else
+            LogStep("All Checkout: Customer Information Page elements are visible");
+
+        return missingElements;
     }
 
     protected string GetInputValue(By locator)
@@ -51,13 +74,32 @@ public class CheckoutCustomerInformation : BasePage
 
     public bool AreCustomerFieldsEmpty()
     {
-        return string.IsNullOrEmpty(GetInputValue(_firstNameInput)) &&
-               string.IsNullOrEmpty(GetInputValue(_lastNameInput)) &&
-               string.IsNullOrEmpty(GetInputValue(_zipCodeInput));
-    }
+        LogStep("Checking customer input fields are empty");
 
-   public CheckoutCustomerInformation EmptyFieldSubmit()
+        bool firstNameEmpty = string.IsNullOrEmpty(GetInputValue(_firstNameInput));
+        bool lastNameEmpty = string.IsNullOrEmpty(GetInputValue(_lastNameInput));
+        bool zipCodeEmpty = string.IsNullOrEmpty(GetInputValue(_zipCodeInput));
+
+        if (!firstNameEmpty)
+            LogStep("First Name field is not empty");
+
+        if (!lastNameEmpty)
+            LogStep("Last Name field is not empty");
+
+        if (!zipCodeEmpty)
+            LogStep("Zip Code field is not empty");
+
+        bool allEmpty = firstNameEmpty && lastNameEmpty && zipCodeEmpty;
+
+        if (allEmpty)
+            LogStep("All customer fields are empty");
+
+        return allEmpty;
+    } 
+
+    public CheckoutCustomerInformation EmptyFieldSubmit()
     {
+        LogStep("Click Continue Button");
         Click(_continueButton);
         return this;
     }
@@ -73,18 +115,21 @@ public class CheckoutCustomerInformation : BasePage
 
     public CheckoutCustomerInformation EnterFirstName(string firstName)
     {
+        LogStep($"Typing {firstName} into the First Name field.");
         TypeText(_firstNameInput, firstName);
         return this;
     }
 
     public CheckoutCustomerInformation EnterLastName(string lastName)
     {
+        LogStep($"Typing {lastName} into the Last Name field.");
         TypeText(_lastNameInput, lastName);
         return this;
     }
 
     public CheckoutCustomerInformation EnterZipCode(string zipCode)
     {
+        LogStep($"Typing {zipCode} into the Zip Code field.");
         TypeText(_zipCodeInput, zipCode);
 
         return this;
@@ -99,6 +144,7 @@ public class CheckoutCustomerInformation : BasePage
 
     public CheckoutOverview ClickContinue()
     {
+        LogStep("Clicking the continue Button");
         Click(_continueButton);
         return new CheckoutOverview(Driver);
     }

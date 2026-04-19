@@ -20,9 +20,11 @@ public class CheckoutCompleteTest : BaseTest
         var lastName = ConfigurationManager.UserDetails.LastName;
         var zipCode = ConfigurationManager.UserDetails.ZipCode;
 
+        Log("Navigating to Login Page");
         var loginPage = new LoginPage(Driver!);
         loginPage.Open();
 
+        Log("Logging in to Sauce Labs.");
         var inventoryPage = loginPage.LoginAs(username, password);
 
         _checkoutComplete = inventoryPage
@@ -38,6 +40,7 @@ public class CheckoutCompleteTest : BaseTest
     [Description("Successful order completion")]
     public void VerifyCheckoutCompletePageElements()
     {
+        Log("Checking that user was directed to the Checkout: Customer Information page.");
         Assert.That(_checkoutComplete.IsAtPage(), Is.True,
             "Expected to be on the Checkout:Customer Information page");
 
@@ -55,6 +58,7 @@ public class CheckoutCompleteTest : BaseTest
     {
         var inventoryPage = _checkoutComplete.ClickBackHomeButton();
 
+        Log("Checking that user can go back to the Inventory page by via Back Home button.");
         Assert.That(inventoryPage.IsAtPage(), Is.True,
             "Expected to be returned to the Inventory page after clicking Back Home");
     }

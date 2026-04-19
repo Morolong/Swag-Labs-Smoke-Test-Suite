@@ -17,8 +17,21 @@ public class ProductDetail : BasePage
     private readonly By _addToCartButton = By.Id("add-to-cart");
     public ProductDetail(IWebDriver driver) : base(driver) { }
 
-    protected override void WaitForPageToLoad() =>
-  Wait.ForElementToBeVisible(_productPageContainer);
+    protected override void WaitForPageToLoad()
+    {
+        LogStep("Waiting for Product Details Page to load");
+
+        try
+        {
+            Wait.ForElementToBeVisible(_productPageContainer);
+            LogStep("Product Details Page loaded successfully");
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+            LogStep($"Product Details Page failed to load - container element not visible within timeout: {ex.Message}");
+            throw;
+        }
+    }
 
     public bool IsAtPage() => base.IsAtPage("inventory-item.html?id=3");
 
@@ -37,8 +50,16 @@ public class ProductDetail : BasePage
             { "Add To Cart ",            _addToCartButton },
         };
 
-        return elements
+        var missingElements = elements
             .Where(e => !IsElementVisible(e.Value))
-            .Select(e => e.Key);
+            .Select(e => e.Key)
+            .ToList();
+
+        if (missingElements.Any())
+            LogStep($"Missing elements: {string.Join(", ", missingElements)}");
+        else
+            LogStep("All Product Detail Page elements are visible");
+
+        return missingElements;
     }
 }

@@ -71,6 +71,11 @@ public static class ReportManager
         _currentTest?.Fail($"Test failed: {errorMessage}"); 
     }
 
+    public static void LogStep(string message)
+    {
+        _currentTest?.Info($"⮕ {message}");
+    }
+
     public static void AttachScreenshot (string screenshotPath)
     {
         if (_currentTest == null || !File.Exists(screenshotPath))

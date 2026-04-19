@@ -18,10 +18,13 @@ public class ProductInventoryTests : BaseTest
         var username = ConfigurationManager.Credentials.PositiveTestUser;
         var password = ConfigurationManager.Credentials.LoginPassword;
 
+        Log("Navigating to Login Page");
         var loginPage = new LoginPage(Driver);
         loginPage.Open();
 
+        Log("Logging in to Sauce Labs.");
         _inventoryPage = loginPage.LoginAs(username, password);
+        Log("Inventory Page has been displayed.");
     }
 
     [Test]
@@ -33,23 +36,10 @@ public class ProductInventoryTests : BaseTest
         var inventoryPage = new ProductInventory(Driver);
         string currentUrl = Driver.Url;
 
-        Assert.That(_inventoryPage.IsAtPage(), Is.True,
-            "URL does not contain '/inventory.html'");
+        var inventoryElements = _inventoryPage.GetInventoryPageElements();
 
-        Assert.That(inventoryPage.IsPageDisplayed(), Is.True,
-            "Inventory page UI not displayed");
-
-        Assert.That(inventoryPage.IsLogoVisible(), Is.True,
-            "Logo did not load");
-
-        Assert.That(inventoryPage.IsCartVisible(), Is.True,
-            "Check Out Cart did not load");
-
-        Assert.That(inventoryPage.IsHeadingVisible(), Is.True,
-            "Page Heading did not lead");
-
-        Assert.That(inventoryPage.IsFilterVisible(), Is.True,
-            "Filter button did not load.");
+        Assert.That(inventoryElements, Is.Empty,
+            $"Elements not visible: {string.Join(", ", inventoryElements)}");
     }
 
     [Test]
@@ -57,13 +47,10 @@ public class ProductInventoryTests : BaseTest
     {
         var inventoryPage = new ProductInventory(Driver);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(inventoryPage.GetStockCount(), Is.EqualTo(6), "Stock item count mismatch");
-            Assert.That(inventoryPage.GetStockImageCount, Is.EqualTo(6), "Stock image count mismatch");
-            Assert.That(inventoryPage.GetStockLabelCount, Is.EqualTo(6), "Stock label count mismatch");
-            Assert.That(inventoryPage.GetAddToCartButtonCount(), Is.EqualTo(6), "Add to cart button count mismatch");
-        });
+        var inventoryElementsCount = _inventoryPage.GetStockCounts();
+
+        Assert.That(inventoryElementsCount, Is.Empty,
+            $"Elements not visible: {string.Join(", ", inventoryElementsCount)}");
     }
 
     [Test]
@@ -101,6 +88,7 @@ public class ProductInventoryTests : BaseTest
     {
         var loginPage = _inventoryPage.Logout();
 
+        Log("Checking that user was directed to the Inventory page.");
         Assert.That(loginPage.IsAtPage(), Is.True,
             "User was not redirected to base login page after logout");
 
