@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using NUnit.Framework.Interfaces;
+﻿using NUnit.Framework.Interfaces;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SmokeTestSuite.Core.Config;
@@ -18,7 +17,7 @@ public abstract class BaseTest
     protected static WaitHelper? Wait;
 
     [ThreadStatic]
-    protected static string? FailureMessage;  // 👈 1. Added
+    protected static string? FailureMessage;
 
     private string _testName = string.Empty;
 
@@ -39,13 +38,18 @@ public abstract class BaseTest
 
         Console.WriteLine($"[START] {_testName}");
 
-        var options = new ChromeOptions();
-
         Driver = WebDriverFactory.CreateDriver();
-
         Wait = new WaitHelper(Driver, ConfigurationManager.Settings.ExplicitWaitSeconds);
 
         ReportManager.StartTest(_testName);
+
+        var runNumber = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER");
+        var environment = Environment.GetEnvironmentVariable("APP_ENVIRONMENT")
+                          ?? ConfigurationManager.Settings.Environment
+                          ?? "local";
+
+        if (runNumber != null)
+            Log($"CI Build: #{runNumber} | Environment: {environment}");
     }
 
     [TearDown]
@@ -81,16 +85,32 @@ public abstract class BaseTest
             Console.WriteLine($"[PASS] {_testName}");
         }
 
-        Driver?.Quit();
-        Driver?.Dispose();
-        Driver = null;
+        try
+        {
+            Driver?.Quit();
+            Driver?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[WARN] Driver quit error (non-fatal): {ex.Message}");
+        }
+        finally
+        {
+            Driver = null;
+        }
     }
 
     [OneTimeTearDown]
     public void OneTimeTearDown()
     {
         ReportManager.FlushReport();
-        Console.WriteLine($"[REPORT] Test report save to: {ConfigurationManager.Settings.ReportDirectory}");
+
+        var runNumber = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER");
+        var reportLabel = runNumber != null
+            ? $"[REPORT] Run #{runNumber} — saved to: {ConfigurationManager.Settings.ReportDirectory}"
+            : $"[REPORT] Test report saved to: {ConfigurationManager.Settings.ReportDirectory}";
+
+        Console.WriteLine(reportLabel);
     }
 
     protected void NavigateToBaseUrl()
