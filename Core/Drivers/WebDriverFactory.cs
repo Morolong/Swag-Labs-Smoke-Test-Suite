@@ -24,7 +24,6 @@ public static class WebDriverFactory
         };
 
         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(implicitWait);
-        driver.Manage().Window.Maximize();
 
         return driver;
     }
