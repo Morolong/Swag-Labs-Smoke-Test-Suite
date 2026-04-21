@@ -2,11 +2,11 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Edge;
-using SmokeTestSuite.Core.Config; 
+using SmokeTestSuite.Core.Config;
 
 namespace SmokeTestSuite.Core.Drivers;
 
-public static class  WebDriverFactory
+public static class WebDriverFactory
 {
     public static IWebDriver CreateDriver()
     {
@@ -20,11 +20,10 @@ public static class  WebDriverFactory
             "firefox" => CreateFirefoxDriver(headless),
             "edge" => CreateEdgeDriver(headless),
             _ => throw new ArgumentException(
-                $"Unsupported browser: '{browser}'.Valid options: chrome, firefox, edge ")
+                $"Unsupported browser: '{browser}'. Valid options: chrome, firefox, edge")
         };
 
         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(implicitWait);
-
         driver.Manage().Window.Maximize();
 
         return driver;
@@ -40,8 +39,7 @@ public static class  WebDriverFactory
 
         if (headless)
         {
-            options.AddArgument("--headless=new");  
-
+            options.AddArgument("--headless=new");
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
             options.AddArgument("--disable-gpu");
@@ -49,9 +47,17 @@ public static class  WebDriverFactory
         }
 
         options.AddArgument("--log-level=3");
-        options.AddExcludedArgument("enable-automation");  
+        options.AddExcludedArgument("enable-automation");
 
-        return new ChromeDriver(options);
+        options.AddArgument("--disable-extensions");
+        options.AddArgument("--disable-notifications");
+        options.AddArgument("--disable-popup-blocking");
+
+        var service = ChromeDriverService.CreateDefaultService();
+        service.SuppressInitialDiagnosticInformation = true;
+        service.HideCommandPromptWindow = true;
+
+        return new ChromeDriver(service, options, TimeSpan.FromSeconds(120));
     }
 
     private static IWebDriver CreateFirefoxDriver(bool headless)
@@ -83,4 +89,3 @@ public static class  WebDriverFactory
         return new EdgeDriver(options);
     }
 }
-
