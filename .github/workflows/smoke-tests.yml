@@ -136,14 +136,6 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Setup Chrome (stable)
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
-
-      - name: Verify Chrome installation
-        run: google-chrome --version
-
       - name: Start virtual display (Xvfb)
         run: |
           sudo apt-get update -qq
