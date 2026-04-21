@@ -186,7 +186,6 @@ jobs:
             FILTER="${{ github.event.inputs.test_filter }}"
           fi
           dotnet test \
-            --no-build \
             --configuration Release \
             --filter "$FILTER" \
             --logger "trx;LogFileName=${{ matrix.suite }}_attempt1.trx" \
@@ -203,7 +202,6 @@ jobs:
           FILTER="Category=${{ matrix.suite }}"
           echo "::warning::Retrying failed tests for ${{ matrix.suite }} suite (attempt 2)"
           dotnet test \
-            --no-build \
             --configuration Release \
             --filter "$FILTER" \
             --logger "trx;LogFileName=${{ matrix.suite }}_attempt2.trx" \
@@ -219,7 +217,6 @@ jobs:
           RETRY_COUNT="${{ github.event.inputs.retry_count || '2' }}"
           echo "::warning::Final retry for ${{ matrix.suite }} suite (attempt 3)"
           dotnet test \
-            --no-build \
             --configuration Release \
             --filter "Category=${{ matrix.suite }}" \
             --logger "trx;LogFileName=${{ matrix.suite }}_attempt3.trx" \
