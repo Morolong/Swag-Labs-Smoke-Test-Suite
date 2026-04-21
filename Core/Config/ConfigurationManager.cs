@@ -13,6 +13,7 @@ public class TestSettings
     public string ScreenshotDirectory { get; set; }
     public string ReportDirectory { get; set; }
     public string ReportName { get; set; }
+    public string Environment { get; set; } 
 }
 
 public class Credentials
@@ -44,6 +45,7 @@ public static class ConfigurationManager
         var configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .AddJsonFile("appsettings.ci.json", optional: true, reloadOnChange: false) 
             .AddEnvironmentVariables()
             .Build();
 
@@ -53,11 +55,22 @@ public static class ConfigurationManager
         settings.ReportDirectory = ResolvePath(settings.ReportDirectory);
         settings.ScreenshotDirectory = ResolvePath(settings.ScreenshotDirectory);
 
+        settings.BaseUrl = System.Environment.GetEnvironmentVariable("APP_BASE_URL")
+                           ?? settings.BaseUrl;
+        settings.Environment = System.Environment.GetEnvironmentVariable("APP_ENVIRONMENT")
+                               ?? settings.Environment
+                               ?? "local";
+
         var credentials = configuration.GetSection("Credentials").Get<Credentials>()
             ?? new Credentials();
 
+        credentials.PositiveTestUser = System.Environment.GetEnvironmentVariable("APP_USERNAME")
+                                       ?? credentials.PositiveTestUser;
+        credentials.LoginPassword = System.Environment.GetEnvironmentVariable("APP_PASSWORD")
+                                       ?? credentials.LoginPassword;
+
         var userDetails = configuration.GetSection("UserDetails").Get<UserDetails>()
-            ?? new UserDetails(); 
+            ?? new UserDetails();
 
         return (settings, credentials, userDetails);
     }

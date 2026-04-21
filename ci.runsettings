@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <NUnit>
+    <NumberOfTestWorkers>2</NumberOfTestWorkers>
+    <TestTimeout>120000</TestTimeout>
+    <StopOnError>false</StopOnError>
+  </NUnit>
+  <RunConfiguration>
+    <MaxCpuCount>2</MaxCpuCount>
+    <ResultsDirectory>TestResults</ResultsDirectory>
+    <TestSessionTimeout>1800000</TestSessionTimeout>
+    <RandomSeed>42</RandomSeed>
+  </RunConfiguration>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="blame" enabled="true">
+        <Configuration>
+          <CollectDumpOnTestSessionHang>true</CollectDumpOnTestSessionHang>
+          <HangDumpType>Mini</HangDumpType>
+          <TestTimeout>120000</TestTimeout>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
