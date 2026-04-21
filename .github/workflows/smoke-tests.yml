@@ -246,6 +246,10 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: always()
+    permissions:
+    checks: write          
+    pull-requests: write   
+    contents: read         
 
     steps:
       - name: Checkout repository
