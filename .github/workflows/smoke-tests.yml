@@ -1,0 +1,375 @@
+﻿name: Smoke Test Automation CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+  schedule:
+    - cron: '0 0 * * *'
+
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+          - qa
+      browser:
+        description: 'Browser to run tests on'
+        required: false
+        default: 'chrome'
+        type: choice
+        options:
+          - chrome
+          - firefox
+          - edge
+      test_filter:
+        description: 'NUnit test filter (e.g. Category=Login)'
+        required: false
+        default: ''
+      retry_count:
+        description: 'Number of retries for flaky tests'
+        required: false
+        default: '2'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  TEST_RESULTS_DIR: TestResults
+  SCREENSHOTS_DIR: Screenshots
+  REPORTS_DIR: Reports
+
+jobs:
+  build:
+    name: Build & Validate
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution (no restore)
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Set version output
+        id: version
+        run: echo "version=$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: '**/bin/Release/**'
+          retention-days: 1
+
+  test:
+    name: Run Tests – ${{ matrix.suite }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - Login
+          - ProductDetail
+          - Cart
+          - Checkout
+          - CheckoutComplete
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Setup Chrome (stable)
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Verify Chrome installation
+        run: google-chrome --version
+
+      - name: Start virtual display (Xvfb)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb
+          Xvfb :99 -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+
+      - name: Configure test environment
+        run: |
+          cat > appsettings.ci.json << EOF
+          {
+            "AppSettings": {
+              "BaseUrl": "${{ secrets.APP_BASE_URL }}",
+              "Username": "${{ secrets.APP_USERNAME }}",
+              "Password": "${{ secrets.APP_PASSWORD }}",
+              "Browser": "${{ github.event.inputs.browser || 'chrome' }}",
+              "Headless": true,
+              "ImplicitWait": 10,
+              "ExplicitWait": 30,
+              "PageLoadTimeout": 60,
+              "Environment": "${{ github.event.inputs.environment || 'staging' }}",
+              "ScreenshotOnFailure": true,
+              "ParallelWorkers": 2
+            }
+          }
+          EOF
+
+      - name: Create output directories
+        run: |
+          mkdir -p ${{ env.TEST_RESULTS_DIR }}
+          mkdir -p ${{ env.SCREENSHOTS_DIR }}
+          mkdir -p ${{ env.REPORTS_DIR }}
+
+      - name: Run ${{ matrix.suite }} tests (attempt 1)
+        id: test_run_1
+        continue-on-error: true
+        run: |
+          FILTER="Category=${{ matrix.suite }}"
+          if [ -n "${{ github.event.inputs.test_filter }}" ]; then
+            FILTER="${{ github.event.inputs.test_filter }}"
+          fi
+          dotnet test \
+            --no-build \
+            --configuration Release \
+            --filter "$FILTER" \
+            --logger "trx;LogFileName=${{ matrix.suite }}_attempt1.trx" \
+            --logger "console;verbosity=normal" \
+            --results-directory "${{ env.TEST_RESULTS_DIR }}" \
+            --settings ci.runsettings \
+            -- NUnit.NumberOfTestWorkers=2
+
+      - name: Retry failed ${{ matrix.suite }} tests (attempt 2)
+        id: test_run_2
+        if: steps.test_run_1.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          FILTER="Category=${{ matrix.suite }}"
+          echo "::warning::Retrying failed tests for ${{ matrix.suite }} suite (attempt 2)"
+          dotnet test \
+            --no-build \
+            --configuration Release \
+            --filter "$FILTER" \
+            --logger "trx;LogFileName=${{ matrix.suite }}_attempt2.trx" \
+            --logger "console;verbosity=normal" \
+            --results-directory "${{ env.TEST_RESULTS_DIR }}" \
+            --settings ci.runsettings \
+            -- NUnit.NumberOfTestWorkers=1
+
+      - name: Retry failed ${{ matrix.suite }} tests (attempt 3 – final)
+        id: test_run_3
+        if: steps.test_run_1.outcome == 'failure' && steps.test_run_2.outcome == 'failure'
+        run: |
+          RETRY_COUNT="${{ github.event.inputs.retry_count || '2' }}"
+          echo "::warning::Final retry for ${{ matrix.suite }} suite (attempt 3)"
+          dotnet test \
+            --no-build \
+            --configuration Release \
+            --filter "Category=${{ matrix.suite }}" \
+            --logger "trx;LogFileName=${{ matrix.suite }}_attempt3.trx" \
+            --logger "console;verbosity=detailed" \
+            --results-directory "${{ env.TEST_RESULTS_DIR }}" \
+            --settings ci.runsettings \
+            -- NUnit.NumberOfTestWorkers=1
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.suite }}
+          path: ${{ env.TEST_RESULTS_DIR }}/**/*.trx
+          retention-days: 30
+
+      - name: Upload failure screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: screenshots-${{ matrix.suite }}-${{ github.run_number }}
+          path: ${{ env.SCREENSHOTS_DIR }}/**
+          retention-days: 14
+
+      - name: Upload ExtentReports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: extent-report-${{ matrix.suite }}
+          path: ${{ env.REPORTS_DIR }}/**
+          retention-days: 30
+
+  report:
+    name: Generate Consolidated Report
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: AllTestResults
+          merge-multiple: true
+
+      - name: Download all screenshots
+        uses: actions/download-artifact@v4
+        with:
+          pattern: screenshots-*
+          path: AllScreenshots
+          merge-multiple: true
+        continue-on-error: true
+
+      - name: Download all ExtentReports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: extent-report-*
+          path: AllReports
+          merge-multiple: true
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install TRX merger tool
+        run: dotnet tool install -g trx-merge || true
+
+      - name: Install report generator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate unified HTML report
+        run: |
+          reportgenerator \
+            -reports:"AllTestResults/**/*.trx" \
+            -targetdir:"ConsolidatedReport" \
+            -reporttypes:"Html;Badges;JsonSummary" \
+            -title:"Smoke Test Results – Build ${{ github.run_number }}"
+
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidated-report-${{ github.run_number }}
+          path: ConsolidatedReport
+          retention-days: 60
+
+      - name: Publish test summary to GitHub
+        uses: dorny/test-reporter@v1
+        with:
+          name: NUnit Test Results
+          path: AllTestResults/**/*.trx
+          reporter: dotnet-trx
+          fail-on-error: false
+
+      - name: Post summary to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summary = '## Smoke Test Results\n\n';
+            summary += '| Suite | Status |\n|-------|--------|\n';
+            const suites = ['Login', 'ProductDetail', 'Cart', 'Checkout', 'CheckoutComplete'];
+            suites.forEach(s => {
+              const icon = '${{ needs.test.result }}' === 'success' ? '✅' : '❌';
+              summary += `| ${s} | ${icon} |\n`;
+            });
+            summary += '\n> Full report available in workflow artifacts.';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+  notify:
+    name: Notify on Failure
+    needs: [build, test, report]
+    runs-on: ubuntu-latest
+    if: failure() && (github.event_name == 'schedule' || github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "🚨 *Smoke Tests FAILED* on `${{ github.ref_name }}`\n• Workflow: ${{ github.workflow }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|#${{ github.run_number }}>\n• Triggered by: ${{ github.event_name }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        continue-on-error: true
+
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "🚨 Smoke Tests Failed – ${{ github.repository }} #${{ github.run_number }}"
+          body: |
+            Smoke tests failed on branch: ${{ github.ref_name }}
+            Event: ${{ github.event_name }}
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: ${{ secrets.QA_TEAM_EMAIL }}
+          from: GitHub Actions
+        continue-on-error: true
