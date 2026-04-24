@@ -8,15 +8,25 @@ Architecture
 Tech Stack
     Dependency                          Version                    Purpose
      .NET                                 10.0                       Target framework
+     
      NUnit                                4.5.1                      Test framework
+     
      NUnit3TestAdapter                    6.1.0                      VS / CLI test runner integration
+     
      NUnit.Analyzers                      4.12.0                     Static analysis for NUnit usage
+     
      Selenium.WebDriver                   4.41.0                     Browser automation
+     
      Selenium.Support                     4.41.0                     WebDriver helper utilities
+     
      DotNetSeleniumExtras.WaitHelpers     3.11.0                     Explicit wait conditions
+     
      ExtentReports                        5.0.4                      HTML test reporting
+     
      Microsoft.Extensions.Configuration   10.0.5                     JSON & environment variable config
+     
      coverlet.collector                   8.0.1                      Code coverage collection
+     
      Microsoft.NET.Test.Sdk               18.3.0                     MSBuild test infrastructure
 
 Prerequisites
@@ -26,12 +36,12 @@ Prerequisites
 
 Getting Started
     1. Clone the repository
-    bashgit clone https://github.com/<your-org>/SmokeTestSuite.git
+    bashgit clone https://github.com/Morolong/Swag-Labs-Smoke-Test-Suite.git
     cd SmokeTestSuite
     2. Configure the test environment
     Copy or edit appsettings.json to point at your target environment:
     json{
-      "BaseUrl": "https://your-app-url.com",
+      "BaseUrl": "https://www.saucedemo.com",
       "Browser": "Chrome",
       "ImplicitWaitSeconds": 10
     }
@@ -66,13 +76,21 @@ CI/CD
 Project Structure
 SmokeTestSuite/
 ├── .github/
+
 │   └── workflows/
+
 │       └── smoke-tests.yml       # GitHub Actions CI workflow
+
 ├── docs/
+
 │   ├── uml-diagram.png           # UML class diagram
+
 │   └── data-flow-diagram.png     # Data flow diagram
+
 ├── appsettings.json              # Base environment configuration
+
 ├── SmokeTestSuite.csproj         # Project file
+
 └── SmokeTestSuite.slnx           # Solution file
 
 License
