@@ -1,9 +1,9 @@
 # SmokeTestSuite
-    An automated smoke testing framework built with Selenium WebDriver and NUnit, targeting .NET 10. Designed to provide rapid, high-confidence validation of critical application paths after deployments or releases.
+An automated smoke testing framework built with Selenium WebDriver and NUnit, targeting .NET 10. Designed to provide rapid, high-confidence validation of critical application paths after deployments or releases.
 
 ## Architecture
-  - UML Diagram (use draw.io to view): Class Structure and component relationships.
-  - Data Flow Diagram (on Page 2 fo the UML Diagram and Data Flow Diagram document, use draw.io to view): shows end-to-end data flow through the test pipeline.
+- UML Diagram (use draw.io to view): Class Structure and component relationships.
+- Data Flow Diagram (on Page 2 fo the UML Diagram and Data Flow Diagram document, use draw.io to view): shows end-to-end data flow through the test pipeline.
 
 ## Tech Stack
 ```
