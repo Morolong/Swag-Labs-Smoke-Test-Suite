@@ -21,56 +21,56 @@ An automated smoke testing framework built with Selenium WebDriver and NUnit, ta
      Microsoft.NET.Test.Sdk               18.3.0                     MSBuild test infrastructure
 ```
 ## Prerequisites
-    .NET 10 SDK
-    A compatible WebDriver binary in your PATH (e.g. ChromeDriver, GeckoDriver) matching your installed browser version
-    Git
+.NET 10 SDK
+A compatible WebDriver binary in your PATH (e.g. ChromeDriver, GeckoDriver) matching your installed browser version
+Git
 
 ## Getting Started
-    1. Clone the repository
-    ```bash
-    git clone https://github.com/Morolong/Swag-Labs-Smoke-Test-Suite.git
-    cd SmokeTestSuite
-    ```
-    2. Configure the test environment
-    Copy or edit appsettings.json to point at your target environment:
-    ```json
-    {
-      "BaseUrl": "https://www.saucedemo.com",
-      "Browser": "Chrome",
-      "ImplicitWaitSeconds": 10
-    }
-    ```
-    Environment variables override appsettings.json values at runtime, making it easy to inject configuration in CI without modifying source files.
-    3. Restore dependencies
-    bashdotnet restore
-    4. Build
-    ```bash
-    dotnet build --configuration Release
-    ```
-    5. Run the smoke tests
-    ```bash
-    dotnet test --configuration Release
-    ```
+1. Clone the repository
+```bash
+git clone https://github.com/Morolong/Swag-Labs-Smoke-Test-Suite.git
+cd SmokeTestSuite
+```
+2. Configure the test environment
+Copy or edit appsettings.json to point at your target environment:
+```json
+{
+  "BaseUrl": "https://www.saucedemo.com",
+  "Browser": "Chrome",
+  "ImplicitWaitSeconds": 10
+}
+```
+Environment variables override appsettings.json values at runtime, making it easy to inject configuration in CI without modifying source files.
+3. Restore dependencies
+bashdotnet restore
+4. Build
+```bash
+dotnet build --configuration Release
+```
+5. Run the smoke tests
+```bash
+dotnet test --configuration Release
+```
 
 ## Configuration
-    Configuration is loaded in priority order:
-    
-    Environment variables (highest priority — ideal for CI/CD)
-    appsettings.json (committed base config)
-    
-    appsettings.json is automatically copied to the output directory on every build.
+Configuration is loaded in priority order:
+
+Environment variables (highest priority — ideal for CI/CD)
+appsettings.json (committed base config)
+
+appsettings.json is automatically copied to the output directory on every build.
 
 ## Test Reports
-    This suite uses ExtentReports to generate a rich HTML report after each test run. The report is written to the output directory and includes:
-    
-    Pass / fail / skip summary
-    Per-test execution timeline
-    Step-level logging and screenshots on failure
+This suite uses ExtentReports to generate a rich HTML report after each test run. The report is written to the output directory and includes:
+
+Pass / fail / skip summary
+Per-test execution timeline
+Step-level logging and screenshots on failure
 
 
 ## CI/CD
-    A GitHub Actions workflow is included at .github/workflows/smoke-tests.yml. It triggers automatically on push and pull request events, running the full suite against the configured target environment.
-    To configure secrets (e.g. BASE_URL, credentials), add them in your repository under Settings → Secrets and variables → Actions.
+A GitHub Actions workflow is included at .github/workflows/smoke-tests.yml. It triggers automatically on push and pull request events, running the full suite against the configured target environment.
+To configure secrets (e.g. BASE_URL, credentials), add them in your repository under Settings → Secrets and variables → Actions.
 
 ## Project Structure
 ```
@@ -87,4 +87,4 @@ SmokeTestSuite/
 ```
 
 ## License
-    This project is licensed under the MIT License
+This project is licensed under the MIT License
