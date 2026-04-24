@@ -6,7 +6,7 @@ Architecture
   - Data Flow Diagram (on Page 2 fo the UML Diagram and Data Flow Diagram document, use draw.io to view): shows end-to-end data flow through the test pipeline.
 
 Tech Stack
-```bash
+```
     Dependency                          Version                    Purpose
      .NET                                 10.0                       Target framework
      
@@ -75,26 +75,18 @@ CI/CD
     To configure secrets (e.g. BASE_URL, credentials), add them in your repository under Settings → Secrets and variables → Actions.
 
 Project Structure
-
+```
 SmokeTestSuite/
-
 ├── .github/
-
 │   └── workflows/
-
 │       └── smoke-tests.yml       # GitHub Actions CI workflow
-
 ├── docs/
-
 │   ├── uml-diagram.png           # UML class diagram
-
 │   └── data-flow-diagram.png     # Data flow diagram
-
 ├── appsettings.json              # Base environment configuration
-
 ├── SmokeTestSuite.csproj         # Project file
-
 └── SmokeTestSuite.slnx           # Solution file
+```
 
 License
     This project is licensed under the MIT License
