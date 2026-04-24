@@ -64,16 +64,16 @@ CI/CD
     To configure secrets (e.g. BASE_URL, credentials), add them in your repository under Settings → Secrets and variables → Actions.
 
 Project Structure
-    SmokeTestSuite/
-    ├── .github/
-    │   └── workflows/
-    │       └── smoke-tests.yml       # GitHub Actions CI workflow
-    ├── docs/
-    │   ├── uml-diagram.png           # UML class diagram
-    │   └── data-flow-diagram.png     # Data flow diagram
-    ├── appsettings.json              # Base environment configuration
-    ├── SmokeTestSuite.csproj         # Project file
-    └── SmokeTestSuite.slnx           # Solution file
+SmokeTestSuite/
+├── .github/
+│   └── workflows/
+│       └── smoke-tests.yml       # GitHub Actions CI workflow
+├── docs/
+│   ├── uml-diagram.png           # UML class diagram
+│   └── data-flow-diagram.png     # Data flow diagram
+├── appsettings.json              # Base environment configuration
+├── SmokeTestSuite.csproj         # Project file
+└── SmokeTestSuite.slnx           # Solution file
 
 License
     This project is licensed under the MIT License
