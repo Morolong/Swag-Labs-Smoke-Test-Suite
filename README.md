@@ -6,6 +6,7 @@ Architecture
   - Data Flow Diagram (on Page 2 fo the UML Diagram and Data Flow Diagram document, use draw.io to view): shows end-to-end data flow through the test pipeline.
 
 Tech Stack
+```bash
     Dependency                          Version                    Purpose
      .NET                                 10.0                       Target framework
      
@@ -28,7 +29,7 @@ Tech Stack
      coverlet.collector                   8.0.1                      Code coverage collection
      
      Microsoft.NET.Test.Sdk               18.3.0                     MSBuild test infrastructure
-
+```
 Prerequisites
     .NET 10 SDK
     A compatible WebDriver binary in your PATH (e.g. ChromeDriver, GeckoDriver) matching your installed browser version
@@ -74,7 +75,9 @@ CI/CD
     To configure secrets (e.g. BASE_URL, credentials), add them in your repository under Settings → Secrets and variables → Actions.
 
 Project Structure
+
 SmokeTestSuite/
+
 ├── .github/
 
 │   └── workflows/
